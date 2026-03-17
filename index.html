@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Operator Archive | Cybersecurity Portfolio</title>
+    <meta
+      name="description"
+      content="Single-page cybersecurity portfolio for a penetration tester and red team operator."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              obsidian: "#0b0f12",
+              terminal: "#2cff88",
+              warning: "#ff5a5f",
+              panel: "#10171a",
+              panelsoft: "#162127",
+              accent: "#66e3ff",
+            },
+            fontFamily: {
+              mono: ['"JetBrains Mono"', "monospace"],
+            },
+            boxShadow: {
+              terminal:
+                "0 0 0 1px rgba(44,255,136,0.16), 0 24px 60px rgba(0,0,0,0.42)",
+              warning:
+                "0 0 0 1px rgba(255,90,95,0.22), 0 24px 60px rgba(0,0,0,0.42)",
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="booting bg-obsidian font-mono text-zinc-100 antialiased">
+    <div id="boot-screen" class="boot-screen">
+      <div class="boot-screen__inner">
+        <div class="terminal-frame rounded-2xl border border-terminal/30 bg-black/80 p-6 shadow-terminal">
+          <div class="mb-4 flex items-center justify-between gap-3 text-xs uppercase tracking-[0.35em] text-terminal/90">
+            <span>System Initializing</span>
+            <span id="boot-clock">00:00:00 UTC</span>
+          </div>
+          <div class="rounded-xl border border-terminal/20 bg-panelsoft/80 p-4">
+            <div id="boot-log" class="boot-log" aria-live="polite"></div>
+          </div>
+          <div class="mt-4 space-y-2">
+            <div class="flex items-center justify-between text-[11px] uppercase tracking-[0.3em] text-zinc-400">
+              <span>Archive Sync</span>
+              <span id="boot-progress-value">0%</span>
+            </div>
+            <div class="h-2 overflow-hidden rounded-full border border-terminal/20 bg-zinc-900">
+              <div id="boot-progress" class="h-full w-0 bg-terminal"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pointer-events-none fixed inset-0 z-0">
+      <div class="grid-background"></div>
+      <div class="scanlines"></div>
+      <div class="vignette"></div>
+    </div>
+
+    <button
+      id="palette-toggle"
+      type="button"
+      class="fixed left-4 top-4 z-40 flex items-center gap-2 rounded-full border border-terminal/30 bg-black/85 px-4 py-2 text-xs uppercase tracking-[0.3em] text-terminal shadow-terminal"
+      aria-haspopup="dialog"
+      aria-controls="command-palette"
+    >
+      <span class="h-2 w-2 rounded-full bg-terminal"></span>
+      <span class="sm:hidden">Cmd</span>
+      <span class="hidden sm:inline">Palette</span>
+    </button>
+
+    <button
+      id="nav-toggle"
+      type="button"
+      class="fixed right-4 top-4 z-40 flex items-center gap-2 rounded-full border border-terminal/30 bg-black/85 px-4 py-2 text-xs uppercase tracking-[0.3em] text-terminal shadow-terminal md:hidden"
+      aria-expanded="false"
+      aria-controls="file-sidebar"
+    >
+      <span class="h-2 w-2 rounded-full bg-terminal"></span>
+      /root
+    </button>
+
+    <div
+      id="nav-backdrop"
+      class="fixed inset-0 z-30 hidden bg-black/70 backdrop-blur-sm md:hidden"
+    ></div>
+
+    <div class="relative z-10 min-h-screen">
+      <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+        <div class="flex flex-col gap-8 md:flex-row lg:gap-10">
+          <aside
+            id="file-sidebar"
+            class="fixed inset-y-0 right-0 z-40 w-[86vw] max-w-xs translate-x-full border-l border-terminal/20 bg-black/95 p-6 shadow-terminal transition-transform duration-300 md:sticky md:top-8 md:right-auto md:inset-y-auto md:max-h-[calc(100vh-4rem)] md:w-72 md:max-w-none md:translate-x-0 md:overflow-y-auto md:rounded-3xl md:border md:border-terminal/20 md:bg-black/75 md:backdrop-blur"
+          >
+            <div class="flex h-full flex-col">
+              <div class="border-b border-terminal/20 pb-4">
+                <p class="text-[11px] uppercase tracking-[0.35em] text-zinc-500">
+                  File Directory
+                </p>
+                <h2 class="mt-3 text-lg font-bold uppercase tracking-[0.25em] text-terminal">
+                  /root/archive
+                </h2>
+                <p class="mt-2 text-sm leading-6 text-zinc-400">
+                  MSc Cyber Security portfolio focused on practical SOC,
+                  offensive, phishing, and wireless security work.
+                </p>
+                <button
+                  id="sidebar-palette-toggle"
+                  type="button"
+                  class="palette-launch mt-5"
+                  aria-haspopup="dialog"
+                  aria-controls="command-palette"
+                >
+                  <span>Open Command Palette</span>
+                  <span>Ctrl/Cmd + K</span>
+                </button>
+              </div>
+
+              <nav class="mt-6 flex-1 space-y-3 text-sm">
+                <a class="directory-link" data-section-link href="#hero">/root/operator</a>
+                <a class="directory-link" data-section-link href="#about">/root/about_me</a>
+                <a class="directory-link" data-section-link href="#arsenal">/root/arsenal</a>
+                <a class="directory-link" data-section-link href="#investigations">/root/investigations</a>
+                <a class="directory-link" data-section-link href="#contact">/root/transmission</a>
+              </nav>
+
+              <div class="command-shell mt-6">
+                <div class="command-shell__header">
+                  <span>Navigator Shell</span>
+                  <span>Type `help`</span>
+                </div>
+                <div id="command-log" class="command-log">
+                  <p>&gt; Ready for commands.</p>
+                  <p>&gt; Try `help`, `about`, `projects`, or `contact`.</p>
+                </div>
+                <form id="command-form" class="command-form">
+                  <span class="command-prompt">&gt;</span>
+                  <input
+                    id="command-input"
+                    class="command-input"
+                    type="text"
+                    name="command"
+                    placeholder="help"
+                    autocomplete="off"
+                    spellcheck="false"
+                  />
+                </form>
+              </div>
+
+              <div class="mt-6 rounded-2xl border border-warning/30 bg-warning/10 p-4 text-xs leading-6 text-zinc-300">
+                <p class="uppercase tracking-[0.35em] text-warning">Classified</p>
+                <p class="mt-2">
+                  Unauthorized viewing may trigger active countermeasures.
+                </p>
+              </div>
+            </div>
+          </aside>
+
+          <main class="min-w-0 w-full flex-1 md:pr-2">
+            <section
+              id="hero"
+              class="reveal terminal-frame overflow-hidden rounded-[2rem] border border-terminal/20 bg-black/70 shadow-terminal"
+            >
+              <div class="grid gap-8 p-6 sm:p-8 lg:grid-cols-[1.3fr_0.7fr] lg:p-10">
+                <div>
+                  <div class="motion-track inline-flex items-center gap-3 rounded-full border border-terminal/20 bg-terminal/10 px-4 py-2 text-[11px] uppercase tracking-[0.35em] text-terminal" data-motion-depth="10">
+                    <span class="h-2 w-2 rounded-full bg-terminal shadow-[0_0_16px_rgba(44,255,136,0.8)]"></span>
+                    Active Operator Dossier
+                  </div>
+
+                  <p class="mt-8 text-xs uppercase tracking-[0.45em] text-zinc-500">
+                    Archive Entry 01
+                  </p>
+                  <h1 class="mt-4 max-w-3xl text-4xl font-extrabold uppercase tracking-[0.12em] text-zinc-100 sm:text-5xl lg:text-6xl">
+                    OPERATOR:
+                    <span class="block text-terminal">Kousik Kumar Samanta</span>
+                  </h1>
+                  <p class="mt-5 max-w-2xl text-base leading-8 text-zinc-300 sm:text-lg">
+                    Specialization: Cyber Security postgraduate at Newcastle
+                    University focused on SOC operations, offensive security,
+                    vulnerability assessment, and security automation. Building
+                    practical tools that turn cyber concepts into working
+                    monitoring, triage, and auditing workflows.
+                  </p>
+
+                  <div class="motion-track mt-8 grid gap-4 sm:grid-cols-3" data-motion-depth="16">
+                    <div class="stat-card">
+                      <span class="stat-card__label">Current Focus</span>
+                      <strong class="stat-card__value">SOC + Offensive Security</strong>
+                    </div>
+                    <div class="stat-card">
+                      <span class="stat-card__label">Education</span>
+                      <strong class="stat-card__value text-terminal">Newcastle University</strong>
+                    </div>
+                    <div class="stat-card">
+                      <span class="stat-card__label">Experience</span>
+                      <strong class="stat-card__value text-warning">6-Month Internship</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="motion-track rounded-[1.5rem] border border-terminal/20 bg-panel/70 p-5" data-motion-depth="18">
+                  <div class="flex items-center justify-between border-b border-terminal/20 pb-3 text-[11px] uppercase tracking-[0.35em] text-zinc-500">
+                    <span>Live Telemetry</span>
+                    <span>UTC</span>
+                  </div>
+                  <div class="mt-5 space-y-4 text-sm leading-7 text-zinc-300">
+                    <div class="telemetry-row">
+                      <span>Portfolio Class</span>
+                      <strong>Cybersecurity Projects</strong>
+                    </div>
+                    <div class="telemetry-row">
+                      <span>Academic Track</span>
+                      <strong>MSc Cyber Security</strong>
+                    </div>
+                    <div class="telemetry-row">
+                      <span>Core Domains</span>
+                      <strong>SOC / Phishing / Wireless / Assessment</strong>
+                    </div>
+                    <div class="telemetry-row">
+                      <span>Development Base</span>
+                      <strong class="text-terminal">Python / JavaScript / Git</strong>
+                    </div>
+                  </div>
+
+                  <div class="mt-6 rounded-2xl border border-terminal/15 bg-black/60 p-4">
+                    <p class="text-[11px] uppercase tracking-[0.35em] text-zinc-500">
+                      Current Objective
+                    </p>
+                    <p class="mt-3 text-sm leading-7 text-zinc-300">
+                      Secure digital infrastructure through practical, automated
+                      solutions that support monitoring, investigation, and
+                      controlled security assessment.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section
+              id="about"
+              class="reveal terminal-frame mt-8 rounded-[2rem] border border-terminal/20 bg-black/70 p-6 shadow-terminal sm:p-8"
+            >
+              <div class="flex flex-col gap-3 border-b border-terminal/20 pb-5 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p class="text-xs uppercase tracking-[0.45em] text-zinc-500">
+                    Personnel Bio
+                  </p>
+                  <h2 class="mt-3 text-3xl font-bold uppercase tracking-[0.18em] text-terminal">
+                    Secret Agency Database
+                  </h2>
+                </div>
+                <span class="motion-track inline-flex items-center rounded-full border border-warning/25 bg-warning/10 px-3 py-1 text-[11px] uppercase tracking-[0.3em] text-warning" data-motion-depth="10">
+                  Verified Entry
+                </span>
+              </div>
+
+              <div class="mt-6 grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
+                <div class="motion-track space-y-6" data-motion-depth="14">
+                  <div class="rounded-[1.5rem] border border-terminal/20 bg-panel/60 p-5">
+                    <p class="text-[11px] uppercase tracking-[0.35em] text-zinc-500">
+                      Identity Snapshot
+                    </p>
+                    <dl class="mt-4 space-y-3 text-sm">
+                      <div class="bio-row">
+                        <dt>Name</dt>
+                        <dd>Kousik Kumar Samanta</dd>
+                      </div>
+                      <div class="bio-row">
+                        <dt>Role</dt>
+                        <dd>Cyber Security Postgraduate Student</dd>
+                      </div>
+                      <div class="bio-row">
+                        <dt>Location</dt>
+                        <dd>Newcastle upon Tyne, UK</dd>
+                      </div>
+                      <div class="bio-row">
+                        <dt>Focus</dt>
+                        <dd>SOC Operations / Offensive Security / Automation</dd>
+                      </div>
+                    </dl>
+                  </div>
+
+                  <div class="rounded-[1.5rem] border border-terminal/20 bg-panel/60 p-5">
+                    <p class="text-[11px] uppercase tracking-[0.35em] text-zinc-500">
+                      Education &amp; Experience
+                    </p>
+                    <dl class="mt-4 space-y-3 text-sm">
+                      <div class="bio-row">
+                        <dt>University</dt>
+                        <dd>Newcastle University</dd>
+                      </div>
+                      <div class="bio-row">
+                        <dt>Degree</dt>
+                        <dd>MSc Cyber Security, Jan 2025 - Present</dd>
+                      </div>
+                      <div class="bio-row">
+                        <dt>Previous Degree</dt>
+                        <dd>BTech Information Technology, 2025</dd>
+                      </div>
+                      <div class="bio-row">
+                        <dt>Industry Experience</dt>
+                        <dd>Software Developer Intern, 6 months</dd>
+                      </div>
+                    </dl>
+                  </div>
+                </div>
+
+                <div class="motion-track rounded-[1.5rem] border border-terminal/20 bg-panel/60 p-5" data-motion-depth="18">
+                  <p class="text-sm leading-8 text-zinc-300">
+                    Cyber Security postgraduate student at Newcastle University
+                    with a strong academic background in Information Technology
+                    and 6 months of software development experience. I use that
+                    mix of development and security knowledge to build practical
+                    tools for SIEM monitoring, phishing investigation, wireless
+                    auditing, and vulnerability assessment.
+                  </p>
+                  <p class="mt-4 text-sm leading-8 text-zinc-300">
+                    My portfolio is intentionally cyber-focused. Instead of
+                    generic software demos, it highlights analyst workflows,
+                    automated security tooling, and controlled lab assessments
+                    that show how I approach real-world cyber problems with
+                    Python, JavaScript, Git, and security tooling.
+                  </p>
+                  <div class="mt-6 grid gap-4 sm:grid-cols-2">
+                    <div class="rounded-2xl border border-terminal/15 bg-black/40 p-4">
+                      <p class="text-[11px] uppercase tracking-[0.3em] text-zinc-500">
+                        Certifications
+                      </p>
+                      <p class="mt-3 text-sm leading-7 text-zinc-300">
+                        IBM Cybersecurity Basics, DevOps on AWS Specialization,
+                        and Introduction to IoT.
+                      </p>
+                    </div>
+                    <div class="rounded-2xl border border-terminal/15 bg-black/40 p-4">
+                      <p class="text-[11px] uppercase tracking-[0.3em] text-zinc-500">
+                        Languages
+                      </p>
+                      <p class="mt-3 text-sm leading-7 text-zinc-300">
+                        English (C2), Bengali, Hindi, and Marathi.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section
+              id="arsenal"
+              class="reveal terminal-frame mt-8 rounded-[2rem] border border-terminal/20 bg-black/70 p-6 shadow-terminal sm:p-8"
+            >
+              <div class="flex flex-col gap-3 border-b border-terminal/20 pb-5 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p class="text-xs uppercase tracking-[0.45em] text-zinc-500">
+                    Arsenal
+                  </p>
+                  <h2 class="mt-3 text-3xl font-bold uppercase tracking-[0.18em] text-terminal">
+                    Cyber Capability Readout
+                  </h2>
+                </div>
+                <p class="text-sm text-zinc-400">
+                  Skills mapped from academic study, cyber projects, and
+                  internship experience.
+                </p>
+              </div>
+
+              <div class="mt-6 grid gap-4 lg:grid-cols-2">
+                <article class="readout-card motion-track" data-motion-depth="12">
+                  <div class="readout-card__header">
+                    <span>Programming &amp; Development</span>
+                    <span>ONLINE</span>
+                  </div>
+                  <div class="mt-4 space-y-3">
+                    <div class="readout-item">
+                      <span>Python</span>
+                      <span class="text-terminal">Strong</span>
+                    </div>
+                    <div class="readout-item">
+                      <span>JavaScript</span>
+                      <span class="text-terminal">Strong</span>
+                    </div>
+                    <div class="readout-item">
+                      <span>C++</span>
+                      <span class="text-terminal">Working</span>
+                    </div>
+                    <div class="readout-item">
+                      <span>HTML / CSS / PHP</span>
+                      <span class="text-terminal">Practical</span>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="readout-card motion-track" data-motion-depth="18">
+                  <div class="readout-card__header">
+                    <span>Frameworks &amp; Interfaces</span>
+                    <span>ONLINE</span>
+                  </div>
+                  <div class="mt-4 space-y-3">
+                    <div class="readout-item">
+                      <span>PyQt6</span>
+                      <span class="text-terminal">Primary</span>
+                    </div>
+                    <div class="readout-item">
+                      <span>Flask</span>
+                      <span class="text-terminal">Working</span>
+                    </div>
+                    <div class="readout-item">
+                      <span>Vue.js</span>
+                      <span class="text-terminal">Working</span>
+                    </div>
+                    <div class="readout-item">
+                      <span>Bootstrap</span>
+                      <span class="text-terminal">Practical</span>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="readout-card motion-track" data-motion-depth="12">
+                  <div class="readout-card__header">
+                    <span>Security Tooling</span>
+                    <span>ONLINE</span>
+                  </div>
+                  <div class="mt-4 space-y-3">
+                    <div class="readout-item">
+                      <span>Kali Linux</span>
+                      <span class="text-terminal">Primary</span>
+                    </div>
+                    <div class="readout-item">
+                      <span>Aircrack-ng Suite</span>
+                      <span class="text-terminal">Practical</span>
+                    </div>
+                    <div class="readout-item">
+                      <span>Vulnerability Assessment</span>
+                      <span class="text-terminal">Core</span>
+                    </div>
+                    <div class="readout-item">
+                      <span>Penetration Testing</span>
+                      <span class="text-terminal">Core</span>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="readout-card motion-track" data-motion-depth="18">
+                  <div class="readout-card__header">
+                    <span>Workflow &amp; Delivery</span>
+                    <span>ONLINE</span>
+                  </div>
+                  <div class="mt-4 space-y-3">
+                    <div class="readout-item">
+                      <span>Git</span>
+                      <span class="text-terminal">Daily Use</span>
+                    </div>
+                    <div class="readout-item">
+                      <span>REST API Integration</span>
+                      <span class="text-terminal">Practical</span>
+                    </div>
+                    <div class="readout-item">
+                      <span>Agile Collaboration</span>
+                      <span class="text-terminal">Team-Based</span>
+                    </div>
+                    <div class="readout-item">
+                      <span>Problem Solving</span>
+                      <span class="text-terminal">Reliable</span>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            </section>
+
+            <section
+              id="investigations"
+              class="reveal terminal-frame mt-8 rounded-[2rem] border border-terminal/20 bg-black/70 p-6 shadow-terminal sm:p-8"
+            >
+              <div class="flex flex-col gap-3 border-b border-terminal/20 pb-5 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p class="text-xs uppercase tracking-[0.45em] text-zinc-500">
+                    Investigations
+                  </p>
+                  <h2 class="mt-3 text-3xl font-bold uppercase tracking-[0.18em] text-terminal">
+                    Classified Dossiers
+                  </h2>
+                </div>
+                <p id="decrypt-copy" class="motion-track text-sm text-zinc-400" data-motion-depth="10">
+                  Hover to decrypt cyber project dossiers.
+                </p>
+              </div>
+
+              <div class="mt-6 grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
+                <article class="dossier-card group">
+                  <div class="dossier-lock">
+                    <span class="dossier-lock__stamp">Restricted Access</span>
+                    <span class="dossier-lock__text" data-text="Hover To Decrypt">
+                      Hover To Decrypt
+                    </span>
+                  </div>
+                  <div class="flex items-center justify-between text-[11px] uppercase tracking-[0.35em] text-zinc-500">
+                    <span>Dossier 01</span>
+                    <span class="text-warning">Classified</span>
+                  </div>
+                  <h3 class="mt-5 text-xl font-bold uppercase tracking-[0.15em] text-zinc-100">
+                    SIEM-Commander
+                  </h3>
+                  <p class="mt-4 text-sm leading-7 text-zinc-300">
+                    A cybersecurity monitoring project built as a desktop SOC
+                    analyst console for a Wazuh lab environment.
+                  </p>
+                  <div class="mt-5 space-y-3 border-t border-terminal/15 pt-4 text-sm leading-7">
+                    <div class="flex items-start justify-between gap-4">
+                      <span class="text-[11px] uppercase tracking-[0.25em] text-zinc-500">
+                        What It Is
+                      </span>
+                      <span class="text-right text-zinc-200">
+                        A SOC dashboard client connected to a live Wazuh lab
+                      </span>
+                    </div>
+                    <div class="flex items-start justify-between gap-4">
+                      <span class="text-[11px] uppercase tracking-[0.25em] text-zinc-500">
+                        Cyber Focus
+                      </span>
+                      <span class="text-right text-zinc-200">
+                        SIEM visibility, alert review, manager health, and agent monitoring
+                      </span>
+                    </div>
+                    <div class="flex items-start justify-between gap-4">
+                      <span class="text-[11px] uppercase tracking-[0.25em] text-zinc-500">
+                        What It Does
+                      </span>
+                      <span class="text-right text-zinc-200">
+                        Pulls Wazuh API and indexer data, checks services over SSH, and surfaces recent alerts
+                      </span>
+                    </div>
+                  </div>
+                  <div class="mt-6 flex flex-wrap gap-2 text-[11px] uppercase tracking-[0.25em] text-terminal">
+                    <span class="tag-chip">Wazuh</span>
+                    <span class="tag-chip">SOC Console</span>
+                    <span class="tag-chip">PyQt6</span>
+                    <span class="tag-chip">SSH Checks</span>
+                  </div>
+                </article>
+
+                <article class="dossier-card group">
+                  <div class="dossier-lock">
+                    <span class="dossier-lock__stamp">Restricted Access</span>
+                    <span class="dossier-lock__text" data-text="Hover To Decrypt">
+                      Hover To Decrypt
+                    </span>
+                  </div>
+                  <div class="flex items-center justify-between text-[11px] uppercase tracking-[0.35em] text-zinc-500">
+                    <span>Dossier 02</span>
+                    <span class="text-warning">Classified</span>
+                  </div>
+                  <h3 class="mt-5 text-xl font-bold uppercase tracking-[0.15em] text-zinc-100">
+                    Phishing Triage Pipeline
+                  </h3>
+                  <p class="mt-4 text-sm leading-7 text-zinc-300">
+                    A cybersecurity automation project for investigating
+                    suspicious email messages and extracting useful security
+                    intelligence from raw <code>.eml</code> files.
+                  </p>
+                  <div class="mt-5 space-y-3 border-t border-terminal/15 pt-4 text-sm leading-7">
+                    <div class="flex items-start justify-between gap-4">
+                      <span class="text-[11px] uppercase tracking-[0.25em] text-zinc-500">
+                        What It Is
+                      </span>
+                      <span class="text-right text-zinc-200">
+                        An analyst-facing phishing triage pipeline with GUI and CLI modes
+                      </span>
+                    </div>
+                    <div class="flex items-start justify-between gap-4">
+                      <span class="text-[11px] uppercase tracking-[0.25em] text-zinc-500">
+                        Cyber Focus
+                      </span>
+                      <span class="text-right text-zinc-200">
+                        Email security, IOC extraction, URL defanging, and enrichment
+                      </span>
+                    </div>
+                    <div class="flex items-start justify-between gap-4">
+                      <span class="text-[11px] uppercase tracking-[0.25em] text-zinc-500">
+                        What It Does
+                      </span>
+                      <span class="text-right text-zinc-200">
+                        Parses emails, hashes attachments, queries VirusTotal and Urlscan, and generates triage reports
+                      </span>
+                    </div>
+                  </div>
+                  <div class="mt-6 flex flex-wrap gap-2 text-[11px] uppercase tracking-[0.25em] text-terminal">
+                    <span class="tag-chip">Email Security</span>
+                    <span class="tag-chip">Tkinter GUI</span>
+                    <span class="tag-chip">CLI</span>
+                    <span class="tag-chip">Threat Enrichment</span>
+                  </div>
+                </article>
+
+                <article class="dossier-card group">
+                  <div class="dossier-lock">
+                    <span class="dossier-lock__stamp">Restricted Access</span>
+                    <span class="dossier-lock__text" data-text="Hover To Decrypt">
+                      Hover To Decrypt
+                    </span>
+                  </div>
+                  <div class="flex items-center justify-between text-[11px] uppercase tracking-[0.35em] text-zinc-500">
+                    <span>Dossier 03</span>
+                    <span class="text-warning">Classified</span>
+                  </div>
+                  <h3 class="mt-5 text-xl font-bold uppercase tracking-[0.15em] text-zinc-100">
+                    Auto-Sentinel
+                  </h3>
+                  <p class="mt-4 text-sm leading-7 text-zinc-300">
+                    A cybersecurity auditing project focused on authorized WPA2
+                    wireless assessment with safe mock-mode support and passive
+                    scanning workflows.
+                  </p>
+                  <div class="mt-5 space-y-3 border-t border-terminal/15 pt-4 text-sm leading-7">
+                    <div class="flex items-start justify-between gap-4">
+                      <span class="text-[11px] uppercase tracking-[0.25em] text-zinc-500">
+                        What It Is
+                      </span>
+                      <span class="text-right text-zinc-200">
+                        A desktop wireless auditing application with PyQt6 interface
+                      </span>
+                    </div>
+                    <div class="flex items-start justify-between gap-4">
+                      <span class="text-[11px] uppercase tracking-[0.25em] text-zinc-500">
+                        Cyber Focus
+                      </span>
+                      <span class="text-right text-zinc-200">
+                        Authorized WPA2 assessment, passive discovery, and capture analysis
+                      </span>
+                    </div>
+                    <div class="flex items-start justify-between gap-4">
+                      <span class="text-[11px] uppercase tracking-[0.25em] text-zinc-500">
+                        What It Does
+                      </span>
+                      <span class="text-right text-zinc-200">
+                        Supports mock training flows, passive network scanning, interface actions, and capture parsing
+                      </span>
+                    </div>
+                  </div>
+                  <div class="mt-6 flex flex-wrap gap-2 text-[11px] uppercase tracking-[0.25em] text-terminal">
+                    <span class="tag-chip">Wireless Auditing</span>
+                    <span class="tag-chip">Mock Mode</span>
+                    <span class="tag-chip">PyQt6</span>
+                    <span class="tag-chip">Passive Scanning</span>
+                  </div>
+                </article>
+              </div>
+            </section>
+
+            <section
+              id="contact"
+              class="reveal terminal-frame mt-8 rounded-[2rem] border border-terminal/20 bg-black/70 p-6 shadow-terminal sm:p-8"
+            >
+              <div class="flex flex-col gap-3 border-b border-terminal/20 pb-5 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p class="text-xs uppercase tracking-[0.45em] text-zinc-500">
+                    Contact
+                  </p>
+                  <h2 class="mt-3 text-3xl font-bold uppercase tracking-[0.18em] text-terminal">
+                    Send Transmission
+                  </h2>
+                </div>
+                <p class="motion-track text-sm text-zinc-400" data-motion-depth="10">
+                  Secure terminal channel for internships, graduate roles, and
+                  cybersecurity collaboration.
+                </p>
+              </div>
+
+              <div class="mt-6 grid gap-6 lg:grid-cols-[1fr_0.8fr]">
+                <form
+                  id="transmission-form"
+                  action="https://formspree.io/f/YOUR_FORM_ID"
+                  method="POST"
+                  class="terminal-console motion-track rounded-[1.5rem] border border-terminal/20 bg-panel/70 p-5"
+                  data-motion-depth="14"
+                >
+                  <input
+                    type="hidden"
+                    name="subject"
+                    value="New portfolio transmission"
+                  />
+                  <label class="terminal-label">
+                    <span>Operator ID</span>
+                    <input
+                      class="terminal-input"
+                      type="text"
+                      name="name"
+                      placeholder="YOUR NAME"
+                      required
+                    />
+                  </label>
+
+                  <label class="terminal-label">
+                    <span>Secure Channel</span>
+                    <input
+                      class="terminal-input"
+                      type="email"
+                      name="email"
+                      placeholder="your.email@example.com"
+                      required
+                    />
+                  </label>
+
+                  <label class="terminal-label">
+                    <span>Mission Brief</span>
+                    <textarea
+                      class="terminal-input min-h-[140px] resize-y"
+                      name="message"
+                      placeholder="Internship, graduate role, freelance project, or collaboration details..."
+                      required
+                    ></textarea>
+                  </label>
+
+                  <p class="terminal-note">
+                    Replace <code>YOUR_FORM_ID</code> with your Formspree form
+                    endpoint to receive submissions in your inbox.
+                  </p>
+
+                  <button
+                    id="transmission-submit"
+                    type="submit"
+                    class="mt-5 inline-flex items-center justify-center rounded-full border border-terminal bg-terminal px-6 py-3 text-sm font-bold uppercase tracking-[0.25em] text-black transition hover:bg-transparent hover:text-terminal"
+                  >
+                    Send Transmission
+                  </button>
+                </form>
+
+                <div class="motion-track rounded-[1.5rem] border border-terminal/20 bg-panel/70 p-5" data-motion-depth="18">
+                  <div class="flex items-center justify-between text-[11px] uppercase tracking-[0.35em] text-zinc-500">
+                    <span>Signal Console</span>
+                    <span class="text-terminal">Listening</span>
+                  </div>
+                  <div
+                    id="transmission-log"
+                    class="mt-4 rounded-2xl border border-terminal/15 bg-black/70 p-4 text-sm leading-7 text-zinc-300"
+                  >
+                    <p>&gt; Status :: Open to cyber security opportunities.</p>
+                    <p>&gt; Base :: Newcastle upon Tyne, UK.</p>
+                  </div>
+                  <div class="mt-4 grid gap-3 sm:grid-cols-2">
+                    <div class="contact-item">
+                      <a
+                        class="contact-link"
+                        href="mailto:kousik83@gmail.com"
+                      >
+                        EMAIL :: kousik83@gmail.com
+                      </a>
+                      <button
+                        class="copy-action"
+                        type="button"
+                        data-copy="kousik83@gmail.com"
+                        data-copy-name="Email"
+                      >
+                        Copy
+                      </button>
+                    </div>
+                    <div class="contact-item">
+                      <a
+                        class="contact-link"
+                        href="tel:+447353803353"
+                      >
+                        PHONE :: +44 7353803353
+                      </a>
+                      <button
+                        class="copy-action"
+                        type="button"
+                        data-copy="+44 7353803353"
+                        data-copy-name="Phone"
+                      >
+                        Copy
+                      </button>
+                    </div>
+                    <div class="contact-item">
+                      <a
+                        class="contact-link"
+                        href="https://www.linkedin.com/in/kousik-samanta-b4736428a"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        LINKEDIN :: /kousik-samanta-b4736428a
+                      </a>
+                      <button
+                        class="copy-action"
+                        type="button"
+                        data-copy="https://www.linkedin.com/in/kousik-samanta-b4736428a"
+                        data-copy-name="LinkedIn"
+                      >
+                        Copy
+                      </button>
+                    </div>
+                    <div class="contact-item">
+                      <a
+                        class="contact-link"
+                        href="https://github.com/Kousiksamanta1"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        GITHUB :: /Kousiksamanta1
+                      </a>
+                      <button
+                        class="copy-action"
+                        type="button"
+                        data-copy="https://github.com/Kousiksamanta1"
+                        data-copy-name="GitHub"
+                      >
+                        Copy
+                      </button>
+                    </div>
+                    <a
+                      class="contact-link sm:col-span-2"
+                      href="./MAIN%20CV.pdf"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      CV :: MAIN CV.pdf
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </main>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="command-palette"
+      class="command-palette hidden"
+      aria-hidden="true"
+    >
+      <div class="command-palette__backdrop" data-palette-close></div>
+      <div
+        class="command-palette__panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="command-palette-title"
+      >
+        <div class="command-palette__header">
+          <div>
+            <p
+              id="command-palette-title"
+              class="text-xs uppercase tracking-[0.35em] text-zinc-500"
+            >
+              Command Palette
+            </p>
+            <p class="mt-2 text-sm text-zinc-400">
+              Type `help`, `about`, `projects`, `contact`, or a copy command.
+            </p>
+          </div>
+          <button
+            id="command-palette-close"
+            type="button"
+            class="command-palette__close"
+          >
+            Esc
+          </button>
+        </div>
+        <label class="sr-only" for="command-palette-input">Command search</label>
+        <input
+          id="command-palette-input"
+          class="command-palette__input"
+          type="text"
+          placeholder="Type a command..."
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <div id="command-palette-list" class="command-palette__list"></div>
+      </div>
+    </div>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
