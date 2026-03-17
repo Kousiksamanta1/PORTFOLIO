@@ -2,7 +2,7 @@
 
 A single-page cybersecurity portfolio for **Kousik Kumar Samanta**, built as a premium "digital forensics archive meets terminal interface" experience.
 
-The site presents an MSc Cyber Security profile with a cyber-first visual identity, animated terminal interactions, dossier-style project cards, and a static deployment workflow that works well with GitHub Pages.
+The site presents an MSc Cyber Security profile with a cyber-first visual identity, animated terminal interactions, and dossier-style project cards.
 
 ## Overview
 
@@ -98,80 +98,3 @@ python3 -m http.server 4173
 3. Visit `http://127.0.0.1:4173`
 
 You can open `index.html` directly, but a local server is better for testing links and deployment parity.
-
-## Contact Form Setup
-
-The contact form is already wired for Formspree-style submission, but it still contains a placeholder endpoint.
-
-In [index.html](/Users/kousiksamanta/Documents/PORTFOLIO/index.html), replace:
-
-```html
-action="https://formspree.io/f/YOUR_FORM_ID"
-```
-
-with your real Formspree endpoint, for example:
-
-```html
-action="https://formspree.io/f/xzzabcde"
-```
-
-Until that is replaced, the interface will show a local status message but will not deliver messages to your inbox.
-
-## Deploy For Free With GitHub Pages
-
-This project works well as a static GitHub Pages site.
-
-### Option 1: User Site
-
-Create a repository named:
-
-```text
-YOUR_USERNAME.github.io
-```
-
-Your site will be published at:
-
-```text
-https://YOUR_USERNAME.github.io/
-```
-
-### Option 2: Project Site
-
-Create any repository name, for example:
-
-```text
-cyber-portfolio
-```
-
-Your site will be published at:
-
-```text
-https://YOUR_USERNAME.github.io/cyber-portfolio/
-```
-
-### Publish Steps
-
-1. Create a new GitHub repository.
-2. Upload the contents of this folder.
-3. Go to `Settings` -> `Pages`.
-4. Under `Build and deployment`, choose `Deploy from a branch`.
-5. Select branch `main` and folder `/(root)`.
-6. Save and wait for GitHub Pages to publish the site.
-
-Because this project uses relative asset paths such as `./styles.css`, `./script.js`, and `./MAIN%20CV.pdf`, it works for both user sites and project sites.
-
-## Suggested Next Upgrades
-
-- replace the Formspree placeholder with your real endpoint
-- add GitHub links or live repo links to each project dossier
-- add screenshots later when ready
-- expand each project into a case-study modal or dedicated page
-- add certifications, timeline, and security domains sections
-- connect a custom domain later if desired
-
-## Notes
-
-- Tailwind is loaded from the CDN inside [index.html](/Users/kousiksamanta/Documents/PORTFOLIO/index.html)
-- interaction logic lives in [script.js](/Users/kousiksamanta/Documents/PORTFOLIO/script.js)
-- theme styling and visual effects live in [styles.css](/Users/kousiksamanta/Documents/PORTFOLIO/styles.css)
-- the CV referenced by the site is [MAIN CV.pdf](/Users/kousiksamanta/Documents/PORTFOLIO/MAIN%20CV.pdf)
