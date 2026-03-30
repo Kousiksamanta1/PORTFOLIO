@@ -21,6 +21,7 @@ The current portfolio highlights practical work in:
 - SOC operations
 - phishing analysis
 - wireless auditing
+- vulnerability assessment
 - security automation
 - offensive security foundations
 
@@ -42,10 +43,11 @@ The current portfolio highlights practical work in:
 - hero section with real profile details
 - personnel bio and cyber-focused background summary
 - arsenal section styled as a system readout
-- three dossier-style project cards:
+- four dossier-style project cards:
   - `SIEM-Commander`
   - `Phishing Triage Pipeline`
   - `Auto-Sentinel`
+  - `VulnScan Pro`
 - glitch-style restricted overlay on project cards
 - contact console with copy-to-clipboard controls
 - Formspree-ready contact form
